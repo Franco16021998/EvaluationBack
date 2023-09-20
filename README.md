@@ -66,6 +66,18 @@ mysql://root:root@host.docker.internal:3306/pulso
 mysql://admin:admin2023@mysql8.cqte2wldqkkr.us-east-2.rds.amazonaws.com:3306/pulso
 ```
 
+## Install cross-env package
+```
+npm install --save-dev cross-env
+```
+
+## Edit scripts in package.json to add NODE_ENV
+"start": "cross-env NODE_ENV=dev nest start",
+"start:dev": "cross-env NODE_ENV=dev nest start --watch",
+"start:debug": "nest start --debug --watch",
+"start:prod": "cross-env NODE_ENV=prod node dist/main",
+
+
 ## Setup database connection at app.module.ts file inside imports section
 ```
 imports: [
@@ -454,17 +466,6 @@ export const CommandHandlers = [RegisterProductHandler];
 })
 export class ProductsModule {}
 ```
-
-## Install cross-env package
-```
-npm install --save-dev cross-env
-```
-
-## Edit scripts in package.json to add NODE_ENV
-"start": "cross-env NODE_ENV=dev nest start",
-"start:dev": "cross-env NODE_ENV=dev nest start --watch",
-"start:debug": "nest start --debug --watch",
-"start:prod": "cross-env NODE_ENV=prod node dist/main",
 
 ## Install npm-run-all package
 ```
