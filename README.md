@@ -48,11 +48,22 @@ $ npm i --save mysql2 typeorm @nestjs/typeorm
 ```
 
 ## Create environment variable
-- ENVIRONMENT
+- NODE_ENV
+- PULSO_NEST_MYSQL_CONNECTION
 
 ## Db String Connection example
 ```
 'mysql://root:root@localhost:3306/pulso'
+```
+
+## Docker Db String Connection example
+```
+mysql://root:root@host.docker.internal:3306/pulso
+```
+
+## RDS Db String Connection example
+```
+mysql://admin:admin2023@mysql8.cqte2wldqkkr.us-east-2.rds.amazonaws.com:3306/pulso
 ```
 
 ## Setup database connection at app.module.ts file inside imports section
@@ -60,21 +71,17 @@ $ npm i --save mysql2 typeorm @nestjs/typeorm
 imports: [
     TypeOrmModule.forRoot({
       type: "mysql",
-      url: process.env.PULSO_DB_STRING_CONNECTION,
+      url: process.env.PULSO_NEST_MYSQL_CONNECTION,
       migrationsRun: true,
       logging: true,
       timezone: '+00:00',
       bigNumberStrings: false,
       entities: [
-        process.env.ENVIRONMENT == 'local' ? 
-        'dist/infrastructure/persistence/entities/*{.ts,.js}' :
-        'infrastructure/persistence/entities/*{.ts,.js}'
+        'dist/infrastructure/persistence/entities/*{.ts,.js}'
       ],
       subscribers: [],
       migrations: [
-        process.env.ENVIRONMENT == 'local' ? 
-        'dist/infrastructure/persistence/migrations/*{.ts,.js}' :
-        'infrastructure/persistence/migrations/*{.ts,.js}'
+        'dist/infrastructure/persistence/migrations/*{.ts,.js}'
       ],
       migrationsTableName: "migrations-typeorm"
     }),
@@ -114,7 +121,7 @@ $ npm i --save node-sql-reader
 - Edit up method in InitialSchema.ts migration
 ```
 public async up(queryRunner: QueryRunner): Promise<void> {
-    const folder = process.env.ENVIRONMENT == 'local' ? __dirname.replace('dist', 'src') : __dirname;
+    const folder = process.env.NODE_ENV == 'dev' ? __dirname.replace('dist', 'src') : __dirname;
     const path = folder + '/initial-schema.sql';
     let queries = SqlReader.readSqlFile(path);
     for (let query of queries)
@@ -152,7 +159,7 @@ VALUES
 Edit up method in MasterData.ts migration
 ```
 public async up(queryRunner: QueryRunner): Promise<void> {
-    const folder = process.env.ENVIRONMENT == 'local' ? __dirname.replace('dist', 'src') : __dirname;
+    const folder = process.env.NODE_ENV == 'dev' ? __dirname.replace('dist', 'src') : __dirname;
     const path = folder + '/master-data.sql';
     let queries = SqlReader.readSqlFile(path);
     for (let query of queries)
@@ -191,10 +198,10 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-  await app.listen(3000);
+  await app.listen(8080);
 }
 ```
-- Testing at http://localhost:3000/api
+- Testing at http://localhost:8080/api
 
 ## Edit /src/app.controller.ts to add @ApiTags('home')
 ```
@@ -231,9 +238,9 @@ export class ProductEntity {
 ```
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
-import { GetProducts } from '../../../features/products/queries/get-products';
 import { ProductEntity } from 'src/infrastructure/persistence/entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { GetProducts } from 'src/features/products/queries/get-products';
 
 @Injectable()
 export class ProductRepository {
@@ -421,14 +428,14 @@ export class ProductsController {
 
 ## Edit products.module.ts file
 ```
-import { Module } from '@nestjs/common';
-import { ProductsController } from './products.controller';
-import { CqrsModule } from '@nestjs/cqrs';
-import { GetProductsHandler } from './queries/get-products';
-import { ProductRepository } from 'src/infrastructure/persistence/repositories/products.repository';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductEntity } from 'src/infrastructure/persistence/entities/product.entity';
-import { RegisterProductHandler } from './commands/register-product';
+import { CqrsModule } from "@nestjs/cqrs";
+import { RegisterProductHandler } from "./commands/register-product";
+import { GetProductsHandler } from "./queries/get-products";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { ProductEntity } from "src/infrastructure/persistence/entities/product.entity";
+import { ProductsController } from "./products.controller";
+import { Module } from "@nestjs/common";
+import { ProductRepository } from "src/infrastructure/persistence/repositories/products.repository";
 
 export const QueryHandlers = [GetProductsHandler];
 export const CommandHandlers = [RegisterProductHandler];
@@ -448,13 +455,23 @@ export const CommandHandlers = [RegisterProductHandler];
 export class ProductsModule {}
 ```
 
-## Add scripts for production build
-- Install npm-run-all package
+## Install cross-env package
+```
+npm install --save-dev cross-env
+```
+
+## Edit scripts in package.json to add NODE_ENV
+"start": "cross-env NODE_ENV=dev nest start",
+"start:dev": "cross-env NODE_ENV=dev nest start --watch",
+"start:debug": "nest start --debug --watch",
+"start:prod": "cross-env NODE_ENV=prod node dist/main",
+
+## Install npm-run-all package
 ```
 $ npm i --save-dev npm-run-all
 ```
 
-- Add scripts in package.json
+## Add scripts in package.json for production build
 ```
 "copy:package": "node -e \"require('fs').copyFile('./package.json', './dist/package.json', function(err) { if (err) console.log(err); else console.log('package.json copied!') })\"",
 "copy:initial-schema": "node -e \"require('fs').copyFile('src/infrastructure/persistence/migrations/initial-schema.sql', './dist/infrastructure/persistence/migrations/initial-schema.sql', function(err) { if (err) console.log(err); else console.log('initial-schema.sql copied!') })\"",
@@ -462,7 +479,125 @@ $ npm i --save-dev npm-run-all
 "postbuild": "run-p copy:package copy:initial-schema copy:master-data"
 ```
 
+## Change default port (3000) to 8080 on main.ts
+
+## Generate build and test prod app
 ```
 $ npm run build
 $ npm run start:prod
 ```
+
+## Deploy to App Runner (via GitHub)
+- commands in App Runner
+- Build command
+```
+npm install && npm run build
+```
+- Start command
+```
+node dist/main
+```
+
+## Install Docker Desktop
+- https://docs.docker.com/docker-for-windows/install/
+```
+$ docker version
+```
+
+## Create Dockerfile at the app root
+```
+FROM node:18.17-alpine
+RUN addgroup -S nest && adduser -S nest -G nest
+USER nest:nest
+WORKDIR /usr/src/app
+COPY --chown=nest:nest package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+CMD [ "node", "dist/main.js" ]
+```
+
+## Create .dockerignore at the app root
+```
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+dist
+```
+
+## Create docker-compose-dev.yml
+```
+services:
+  pulso-api-nestjs:
+    image: pulso-api-nestjs:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      - PULSO_NEST_MYSQL_CONNECTION=mysql://admin:admin2023@mysql8.cqte2wldqkkr.us-east-2.rds.amazonaws.com:3306/pulso
+      - NODE_ENV=dev
+```
+
+## Create docker-compose-prod.yml
+```
+services:
+  pulso-api-nestjs:
+    image: pulso-api-nestjs:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      - PULSO_NEST_MYSQL_CONNECTION=
+      - NODE_ENV=
+```
+
+## Run dev app
+```
+$ docker-compose -f docker-compose-dev.yml up
+```
+
+## AWS Console - Identity and Access Management (IAM)
+- https://console.aws.amazon.com
+```
+Add user, set AdministratorAccess policy and set access key
+```
+
+## Install AWS CLI v2
+- https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-windows.html
+- https://awscli.amazonaws.com/AWSCLIV2.msi
+
+## AWS CLI
+```
+$ aws --version
+$ aws configure
+$ aws iam list-users
+```
+
+## Docker Prod Build
+```
+$ docker-compose -f docker-compose-prod.yml build
+```
+
+## AWS CLI - ECR
+- {aws-account-id}.dkr.ecr.{aws-region}.amazonaws.com
+- {aws-account-id}.dkr.ecr.{aws-region}.amazonaws.com/{ecr-repo-name}
+- {docker-image-name}:version
+```
+$ aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 784798437085.dkr.ecr.us-east-2.amazonaws.com
+
+$ aws ecr create-repository --repository-name pulso-api
+
+$ docker tag pulso-api-nestjs:0.0.1 784798437085.dkr.ecr.us-east-2.amazonaws.com/pulso-api:0.0.1
+
+$ docker push 784798437085.dkr.ecr.us-east-2.amazonaws.com/pulso-api:0.0.1
+```
+
+## Deploy to App Runner (via ECR)
+
+## App Runner FAQs
+https://aws.amazon.com/es/apprunner/faqs
