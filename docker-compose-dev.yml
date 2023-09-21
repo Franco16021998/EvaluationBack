@@ -1,0 +1,11 @@
+services:
+  pulso-api-nestjs:
+    image: pulso-api-nestjs:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      - PULSO_NEST_MYSQL_CONNECTION=mysql://admin:admin2023@mysql8.cqte2wldqkkr.us-east-2.rds.amazonaws.com:3306/pulso
+      - NODE_ENV=dev
