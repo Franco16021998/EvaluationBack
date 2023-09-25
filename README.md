@@ -600,5 +600,10 @@ $ docker push 784798437085.dkr.ecr.us-east-2.amazonaws.com/pulso-api:0.0.1
 
 ## Deploy to App Runner (via ECR)
 
+## Install @aws-sdk/client-secrets-manager npm package
+```
+$ npm install --save @aws-sdk/client-secrets-manager
+```
+
 ## App Runner FAQs
 https://aws.amazon.com/es/apprunner/faqs

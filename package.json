@@ -25,7 +25,9 @@
     "postbuild": "run-p copy:package copy:initial-schema copy:master-data"
   },
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.418.0",
     "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.0.0",
     "@nestjs/cqrs": "^10.2.5",
     "@nestjs/mapped-types": "*",

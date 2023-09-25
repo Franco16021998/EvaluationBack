@@ -2,28 +2,19 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './features/products/products.module';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmConfigService } from './infrastructure/persistence/database/typeorm.config.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: "mysql",
-      url: process.env.PULSO_NEST_MYSQL_CONNECTION,
-      migrationsRun: true,
-      logging: true,
-      timezone: '+00:00',
-      bigNumberStrings: false,
-      entities: [
-        'dist/infrastructure/persistence/entities/*{.ts,.js}'
-      ],
-      subscribers: [],
-      migrations: [
-        'dist/infrastructure/persistence/migrations/*{.ts,.js}'
-      ],
-      migrationsTableName: "migrations-typeorm"
+    TypeOrmModule.forRootAsync({
+      useClass: TypeOrmConfigService,
+      imports: [ConfigModule],
     }),
     ProductsModule,
   ],
   controllers: [AppController],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+}
