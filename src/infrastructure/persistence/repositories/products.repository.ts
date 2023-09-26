@@ -20,13 +20,16 @@ export class ProductRepository {
     const manager = this.dataSource.createEntityManager();
     const sql = `
     SELECT 
-      id,
-      name,
-      image_url
+      p.id,
+      p.name,
+      p.image_url,
+      p.price,
+      pt.name AS type
     FROM 
-      products
+      products p
+      JOIN product_types pt ON p.product_type_id = pt.id
     ORDER BY
-      name;`;
+      p.id;`;
     const rows = await manager.query(sql);
     return rows;
   }
