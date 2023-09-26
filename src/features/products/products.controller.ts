@@ -6,7 +6,9 @@ import { RegisterProduct, RegisterProductMapper, RegisterProductRequest, Registe
 
 const RegisterProductExample = {
   name: 'Test Product',
-  imageUrl: 'Test Url'
+  imageUrl: 'Test Url',
+  price: 50.50,
+  typeId: 1
 };
 
 @Controller('products')
