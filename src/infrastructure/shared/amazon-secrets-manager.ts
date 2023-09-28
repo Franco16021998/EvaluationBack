@@ -8,7 +8,7 @@ export class AmazonSecretsManager {
     const credentials = {
       accessKeyId: awsAccessKeyId,
       secretAccessKey: awsSecretAccessKey,
-  }
+    }
     const client = new SecretsManagerClient({
       credentials: credentials,
       region: region,
