@@ -67,9 +67,12 @@ export class RegisterProductMapper {
     productEntity.name = command.name;
     productEntity.imageUrl = command.imageUrl;
     productEntity.price = command.price;
+    
     let productTypeEntity: ProductTypeEntity = new ProductTypeEntity();
     productTypeEntity.id = command.typeId;
+    
     productEntity.productType = productTypeEntity;
+    
     return productEntity;
   }
 
