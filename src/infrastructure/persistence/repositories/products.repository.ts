@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GetProducts } from 'src/features/products/queries/get-products';
 import { MyDataSourceOptions } from '../database/datasourceoptions';
 import { GetProductByName } from 'src/features/products/queries/get-product-by-name';
-import { ProductTypeEntity } from '../entities/product.type.entity';
 
 @Injectable()
 export class ProductRepository {
@@ -20,42 +19,18 @@ export class ProductRepository {
     if (!this.dataSource.isInitialized)
       this.dataSource = await MyDataSourceOptions.getNewDataSource();
     const manager = this.dataSource.createEntityManager();
-    const sql = `
-    SELECT 
-      p.id,
-      p.name,
-      p.image_url,
-      p.price,
-      pt.name AS type
-    FROM 
-      products p
-      JOIN product_types pt ON p.product_type_id = pt.id
-    ORDER BY
-      p.id;`;
-    const rows = await manager.query(sql);
-    return rows;
+    const sql = `CALL get_products();`;
+    const result = await manager.query(sql);
+    return result[0];
   }
 
   async getProductByName(query: GetProductByName) {
     if (!this.dataSource.isInitialized)
       this.dataSource = await MyDataSourceOptions.getNewDataSource();
       const manager = this.dataSource.createEntityManager();
-      const sql = `
-      SELECT 
-        p.id,
-        p.name,
-        p.image_url,
-        p.price,
-        pt.name AS type
-      FROM 
-        products p
-        JOIN product_types pt ON p.product_type_id = pt.id
-      WHERE
-        p.name = ?
-      ORDER BY
-        p.id;`;
-      const row = await manager.query(sql, [query.name]);
-      return row;
+      const sql = `CALL get_product_by_name(?);`;
+      const result = await manager.query(sql, [query.name.replaceAll('-', ' ')]);
+      return result[0][0];
   }
 
   async create(productEntity: ProductEntity): Promise<ProductEntity> {

@@ -607,3 +607,62 @@ $ npm install --save @aws-sdk/client-secrets-manager
 
 ## App Runner FAQs
 https://aws.amazon.com/es/apprunner/faqs
+
+```
+DELIMITER //
+CREATE PROCEDURE get_products()
+BEGIN
+SELECT 
+      p.id,
+      p.name,
+      p.image_url,
+      p.price,
+      pt.name AS type
+    FROM 
+      products p
+      JOIN product_types pt ON p.product_type_id = pt.id
+    ORDER BY
+      p.id;
+END //
+DELIMITER ;
+```
+
+```
+DELIMITER //
+CREATE PROCEDURE get_products()
+BEGIN
+SELECT 
+  p.id,
+  p.name,
+  p.image_url,
+  p.price,
+  pt.name AS type
+FROM 
+  products p
+  JOIN product_types pt ON p.product_type_id = pt.id
+ORDER BY
+  p.id;
+END //
+DELIMITER ;
+```
+
+```
+DELIMITER //
+CREATE PROCEDURE `get_product_by_name`(IN name VARCHAR(255))
+BEGIN
+SELECT 
+	p.id,
+	p.name,
+	p.image_url,
+	p.price,
+	pt.name AS type
+FROM 
+	products p
+	JOIN product_types pt ON p.product_type_id = pt.id
+WHERE
+	p.name = name
+ORDER BY
+	p.id;
+END //
+DELIMITER ;
+```

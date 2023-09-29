@@ -34,6 +34,9 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       logging: true,
       timezone: '+00:00',
       bigNumberStrings: false,
+      extra: {
+        decimalNumbers: true
+      },
       entities: [
         'dist/infrastructure/persistence/entities/*{.ts,.js}'
       ],
