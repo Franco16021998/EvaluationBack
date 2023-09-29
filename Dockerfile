@@ -1,4 +1,4 @@
-FROM node:18.17-alpine
+FROM node:18.18-alpine
 RUN addgroup -S nest && adduser -S nest -G nest
 USER nest:nest
 WORKDIR /usr/src/app
