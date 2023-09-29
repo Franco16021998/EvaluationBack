@@ -7,7 +7,6 @@ services:
     ports:
       - 8080:8080
     environment:
-      - PULSO_NEST_MYSQL_CONNECTION="mysql://admin:W$jEbXC1^N=>=$S>VjdU-AXK8JIqgFgK@mysql8.cqte2wldqkkr.us-east-2.rds.amazonaws.com:3306/pulso"
       - NODE_ENV=dev
       - AWS_ACCESS_KEY_ID=AKIA3NONBZ3OVQJ2YAO3
       - AWS_SECRET_ACCESS_KEY=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
