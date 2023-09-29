@@ -1,6 +1,6 @@
 services:
   pulso-api-nestjs:
-    image: pulso-api-nestjs:0.0.2
+    image: pulso-api-nestjs:0.0.1
     build:
       context: .
       dockerfile: Dockerfile

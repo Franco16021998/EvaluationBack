@@ -2,6 +2,8 @@
 /dist
 /node_modules
 
+docker-compose-local.yml
+
 # Logs
 logs
 *.log
