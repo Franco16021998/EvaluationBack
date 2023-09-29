@@ -591,11 +591,11 @@ $ docker-compose -f docker-compose-prod.yml build
 ```
 $ aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 784798437085.dkr.ecr.us-east-2.amazonaws.com
 
-$ aws ecr create-repository --repository-name pulso-api
+$ aws ecr create-repository --repository-name pulso-api-nest
 
-$ docker tag pulso-api-nestjs:0.0.1 784798437085.dkr.ecr.us-east-2.amazonaws.com/pulso-api:0.0.1
+$ docker tag pulso-api-nestjs:0.0.1 784798437085.dkr.ecr.us-east-2.amazonaws.com/pulso-api-nest:0.0.1
 
-$ docker push 784798437085.dkr.ecr.us-east-2.amazonaws.com/pulso-api:0.0.1
+$ docker push 784798437085.dkr.ecr.us-east-2.amazonaws.com/pulso-api-nest:0.0.1
 ```
 
 ## Deploy to App Runner (via ECR)
