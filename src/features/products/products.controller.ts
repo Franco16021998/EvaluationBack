@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiBody, ApiExtraModels, ApiOperation, ApiTags, refs } from '@nestjs/swagger';
 import { GetProducts } from './queries/get-products';
 import { RegisterProduct, RegisterProductMapper, RegisterProductRequest, RegisterProductResponse } from './commands/register-product';
+import { GetProductByName } from './queries/get-product-by-name';
 
 const RegisterProductExample = {
   name: 'Test Product',
@@ -27,6 +28,16 @@ export class ProductsController {
   async getProducts() {
     const products = await this.queryBus.execute(new GetProducts());
     return products;
+  }
+
+  @ApiOperation({
+    summary: 'Get product',
+    description: 'Get product by name',
+  })
+  @Get('/:name')
+  async getProductByName(@Param('name') name: string) {
+    const product = await this.queryBus.execute(new GetProductByName(name));
+    return product;
   }
 
   @ApiOperation({

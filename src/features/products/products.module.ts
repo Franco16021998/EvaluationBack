@@ -6,8 +6,9 @@ import { ProductEntity } from "src/infrastructure/persistence/entities/product.e
 import { ProductsController } from "./products.controller";
 import { Module } from "@nestjs/common";
 import { ProductRepository } from "src/infrastructure/persistence/repositories/products.repository";
+import { GetProductByNameHandler } from "./queries/get-product-by-name";
 
-export const QueryHandlers = [GetProductsHandler];
+export const QueryHandlers = [GetProductsHandler, GetProductByNameHandler];
 export const CommandHandlers = [RegisterProductHandler];
 
 @Module({
