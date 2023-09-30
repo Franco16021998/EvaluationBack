@@ -613,25 +613,6 @@ DELIMITER //
 CREATE PROCEDURE get_products()
 BEGIN
 SELECT 
-      p.id,
-      p.name,
-      p.image_url,
-      p.price,
-      pt.name AS type
-    FROM 
-      products p
-      JOIN product_types pt ON p.product_type_id = pt.id
-    ORDER BY
-      p.id;
-END //
-DELIMITER ;
-```
-
-```
-DELIMITER //
-CREATE PROCEDURE get_products()
-BEGIN
-SELECT 
   p.id,
   p.name,
   p.image_url,
